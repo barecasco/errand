@@ -6,18 +6,19 @@ from flask import Flask, redirect, url_for, request, render_template
 from werkzeug.utils import secure_filename
 
 
-UPLOAD_FOLDER = './kml'
-ALLOWED_EXTENSIONS = set(['kml'])
+UPLOAD_FOLDER = '.'
+ALLOWED_EXTENSIONS = set(['kml', 'csv'])
 
-app = Flask("agra")
+app = Flask(__name__)
+
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['ENV'] = 'development'
-app.config['DEBUG'] = True
-app.config['TESTING'] = True
+app.config['DEBUG'] = False
+app.config['TESTING'] = False
 
 # ----------------------- web services
 def compute_from_kml(path,filename):
-    csvfile = './csv/'+ filename + ".csv"
+    csvfile = filename + ".csv"
     ant.transform_kml_to_csv(path, csvfile, filename)
     soldf = ant.request_best_route(csvfile, filename)    
     # todo :erase kml and csv path after use
@@ -32,10 +33,19 @@ def svc_process_kml():
         f.save(path)
         return(compute_from_kml(path, filename))
     
+@app.route('/svc/json/coordinates', methods = ['GET','POST'])
+def json_from_json_coordinates():
+    filename = 'temp'
+    csvfile = filename + ".csv"
+    if request.method == 'POST':
+        js = request.get_json()
+        ant.transform_list_to_csv(js['coordinates'], csvfile, filename)
+        df = ant.request_best_route(csvfile, filename)
+        return(df.to_json())
     
 # ----------------------- gui services
 def render_from_kml(path,filename):
-    csvfile = './csv/'+ filename + ".csv"
+    csvfile = filename + ".csv"
     ant.transform_kml_to_csv(path, csvfile, filename)
     df = ant.request_best_route(csvfile, filename)
     js = json.loads(df.to_json())
@@ -69,8 +79,8 @@ def query_form():
 
 @app.route('/gui/json/coordinates', methods = ['GET','POST'])
 def render_from_json_coordinates():
-    filename = 'mawar'
-    csvfile = './csv/'+ filename + ".csv"
+    filename = 'temp'
+    csvfile = filename + ".csv"
     if request.method == 'POST':
         js = request.get_json()
         ant.transform_list_to_csv(js['coordinates'], csvfile, filename)
@@ -85,5 +95,7 @@ def render_from_json_coordinates():
                 lons = js['lon'],
                 rowkeys = [str(i) for i in range(len(js['stamp']))]
             )
-        )        
-app.run()
+        )
+    
+if __name__ == '__main__':
+    app.run("0.0.0.0")
