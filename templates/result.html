@@ -1,0 +1,43 @@
+<html>
+
+    <style>
+        table, body {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+        }
+
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+
+        tr:nth-child(even) {
+          background-color: #dddddd;
+        }
+    </style>
+
+    <head>
+    
+    </head>
+    
+    <body>
+        <h1>Best Route:</h1>
+        <table>
+            <tr>
+                <th>Place</th>
+                <th>ETA (min)</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+            </tr>
+            {% for key in rowkeys %}
+            <tr>
+                <td>{{ locs[key] }}</td>
+                <td>{{ stamps[key] }}</td>
+                <td>{{ lats[key] }}</td>
+                <td>{{ lons[key] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>

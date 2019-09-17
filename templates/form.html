@@ -1,0 +1,118 @@
+<HTML>
+<HEAD>
+	<TITLE> Coordinate Input Form </TITLE>
+    <style>
+        table, body {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+        }
+
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: right;
+          padding: 8px;
+        }
+
+        tr:nth-child(even) {
+          background-color: #eeeeee;
+        }
+    </style>    
+	<SCRIPT language="javascript">
+		function addRow(tableID) {
+
+			var table = document.getElementById(tableID);
+
+			var rowCount = table.rows.length;
+			var row = table.insertRow(rowCount);
+
+			var cell1 = row.insertCell(0);
+			var element1 = document.createElement("input");
+			element1.type = "checkbox";
+			element1.name="chkbox[]";
+			cell1.appendChild(element1);
+
+			var cell2 = row.insertCell(1);
+			cell2.innerHTML = rowCount;
+
+			var cell3 = row.insertCell(2);
+			var element2 = document.createElement("input");
+			element2.type = "number";
+			element2.name = "txtbox[]";
+			cell3.appendChild(element2);
+            
+            var cell4 = row.insertCell(3);
+			var element3 = document.createElement("input");
+			element3.type = "number";
+			element3.name = "txtbox[]";
+            cell4.appendChild(element3);
+
+		}
+
+		function deleteRow(tableID) {
+			try {
+			var table = document.getElementById(tableID);
+			var rowCount = table.rows.length;
+
+			for(var i=0; i<rowCount; i++) {
+				var row = table.rows[i];
+				var chkbox = row.cells[0].childNodes[0];
+				if(null != chkbox && true == chkbox.checked) {
+					table.deleteRow(i);
+					rowCount--;
+					i--;
+				}
+			}
+			}catch(e) {
+				alert(e);
+			}
+		}
+        
+        function submitData (tableID) {
+            var table = document.getElementById(tableID);
+            var coordinates = [];
+			var rowCount = table.rows.length;
+            console.log(rowCount);
+			for(var i=1; i<rowCount; i++) {
+				var row = table.rows[i];
+                var lat = row.cells[2].firstChild.value;
+                var lon = row.cells[3].firstChild.value;
+                coordinates.push([Number(lat), Number(lon)])
+            }
+            json = JSON.stringify({
+                "coordinates":coordinates
+            });
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'json/coordinates');
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200) {
+                    document.write(this.responseText);
+                    console.log(this.responseText);
+                } 
+            }
+            xhr.send(json);            
+        }
+	</SCRIPT>
+</HEAD>
+<BODY>
+    <h1>Coordinate Input</h1>
+    <div style="width:510px">
+        <INPUT type="button" value="Add" onclick="addRow('dataTable')" />
+        <INPUT type="button" value="Delete" onclick="deleteRow('dataTable')" />
+        <INPUT style="float: right;" type="button" value="Submit" onclick="submitData('dataTable')" />
+        <p></p>
+        <TABLE id="dataTable" width="100%" border="1">
+            <TR>
+                <TH>Check</TH>
+                <TH>Index</TH>
+                <TH>Latitude</TH>
+                <TH>Longitude</TH>
+
+            </TR>
+        </TABLE>
+    </div>
+    <script>
+        addRow('dataTable')
+    </script>
+</BODY>
+</HTML>
