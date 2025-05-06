@@ -18,6 +18,7 @@ alphabet = list(string.ascii_lowercase)
 
 import requests
 
+
 def request_sync_time_matrix(locfile):
     bingkey = "AkLAgpAMiqj6EIoeIWu7H_ld13VmTfnZPh4i7nrObAGF8CfWmRRRjGcgXfaAW5pp"
     url = "https://dev.virtualearth.net/REST/v1/Routes/DistanceMatrix?key="+bingkey
@@ -59,11 +60,15 @@ def create_distance_callback(data, manager):
 
     return distance_callback
 
+
+
 def get_farthest_index(matrix):
     depo_routes = matrix[0]
     max_distance = np.amax (depo_routes)
     res = np.where(depo_routes == max_distance)
     return (res[0][0])
+
+
 
 def print_solution(data, manager, routing, assignment):
     time_dimension = routing.GetDimensionOrDie('Time')
@@ -95,6 +100,8 @@ def print_solution(data, manager, routing, assignment):
     print('Total time of all routes: {}min'.format(total_time))
     return(route_callsigns, timestamps)
 
+
+
 def transform_kml_to_csv(kmlfile, csvfile, solution_id):
     targetpoints = []
     f= open(kmlfile,"r")
@@ -118,6 +125,8 @@ def transform_kml_to_csv(kmlfile, csvfile, solution_id):
     df.to_csv(csvfile)
     return(df)
 
+
+
 def transform_list_to_csv(coordinates, csvfile, solution_id):
     targetpoints = []
     for pair in coordinates:
@@ -136,6 +145,8 @@ def transform_list_to_csv(coordinates, csvfile, solution_id):
     df = df.iloc[:, [4, 0, 1, 3]]
     df.to_csv(csvfile)
     return(df)
+
+
 
 def search_solution ( data ):
     manager = pywrapcp.RoutingIndexManager(len(data['time_matrix']), data['num_vehicles'], data['depot'])
@@ -191,6 +202,8 @@ def search_solution ( data ):
         data['callsigns'].pop(farthest_index)
         search_solution (data)
 
+
+
 def request_best_route(locfile,  solution_name):
     locdf = pd.read_csv(locfile,sep=",")
     
@@ -230,6 +243,8 @@ def request_best_route(locfile,  solution_name):
     })    
     
     return(soldf)
+        
+
         
 def request_waypoints(soldf, solution_name):
     # create waypoints
